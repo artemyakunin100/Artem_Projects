@@ -1,4 +1,5 @@
 import media from '@ohos.multimedia.media'
+import audio from '@ohos.multimedia.audio'
 import common from '@ohos.app.ability.common'
 
 interface TempoPreset {
@@ -14,26 +15,46 @@ struct Metronome {
   @State currentBeat: number = 0
   @State beatsPerMeasure: number = 4
   private intervalId: number = -1
-  private avPlayer: media.AVPlayer | null = null
+  private soundPool: media.SoundPool | null = null
+  private soundId: number = -1
+  private soundReady: boolean = false
 
   async aboutToAppear() {
     const context = getContext(this) as common.UIAbilityContext
-    this.avPlayer = await media.createAVPlayer()
-    this.avPlayer.on('stateChange', (state: string) => {
-      if (state === 'initialized' && this.avPlayer) {
-        this.avPlayer.prepare()
-      } else if (state === 'completed' && this.avPlayer) {
-        this.avPlayer.seek(0)
+    const rendererInfo: audio.AudioRendererInfo = {
+      usage: audio.StreamUsage.STREAM_USAGE_MUSIC,
+      rendererFlags: 0
+    }
+    this.soundPool = await media.createSoundPool(4, rendererInfo)
+    this.soundPool.on('loadComplete', (loadedId: number) => {
+      if (loadedId === this.soundId) {
+        this.soundReady = true
       }
     })
-    const fileDescriptor = await context.resourceManager.getRawFd('rawfile/click.mp3')
-    this.avPlayer.fdSrc = fileDescriptor
+    const fd = await context.resourceManager.getRawFd('rawfile/click.mp3')
+    this.soundId = await this.soundPool.load(fd.fd, fd.offset, fd.length)
+  }
+
+  async aboutToDisappear() {
+    if (this.intervalId !== -1) {
+      clearInterval(this.intervalId)
+      this.intervalId = -1
+    }
+    if (this.soundPool) {
+      await this.soundPool.release()
+      this.soundPool = null
+    }
   }
 
   playBeep() {
-    console.error("###")
-    if (this.avPlayer) {
-      this.avPlayer.play()
+    if (this.soundPool && this.soundReady) {
+      this.soundPool.play(this.soundId, {
+        loop: 0,
+        rate: 1,
+        leftVolume: 1,
+        rightVolume: 1,
+        priority: 1
+      })
     }
   }
 
@@ -44,6 +65,8 @@ struct Metronome {
       this.currentBeat = 0
     } else {
       this.isPlaying = true
+      this.currentBeat = 0
+      this.playBeep()
       const interval = Math.round(60000 / this.bpm)
       this.intervalId = setInterval(() => {
         this.currentBeat = (this.currentBeat + 1) % this.beatsPerMeasure
@@ -118,24 +141,6 @@ struct Metronome {
           })
       }
 
-      /*
-            Column({ space: 8 }) {
-              Text("Tempo Presets")
-                .fontSize(14)
-                .fontColor('#9E9E9E')
-              Row({ space: 12 }) {
-                ForEach([
-                  { label: "Largo", BPM: 50 },
-                  { label: "Andante", BPM: 76 },
-                  { label: "Moderato", BPM: 108 },
-                  { label: "Allegro", BPM: 132 },
-                  { label: "Presto", BPM: 180 }
-                ], (preset: GeneratedTypeLiteralInterface_1) => {
-
-                })
-              }
-            }
-      */
 
       Column({ space: 8 }) {
         Text('Time Signature')

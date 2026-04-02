@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\awx1504202\\.ohos\\config\\default_Metronome_App_YtdVV7AkKXvVweTHTB1vuAW2KS29gDBNnPxmvMi-U_M=.cer",
+          "certpath": "C:\\Users\\huawei\\.ohos\\config\\default_Metronome_App_JFS6aVfLClJvavVm6ON9S3dmeqmTsiPXwVHE7fuferI=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001A6D1B44CC610C09C250DE24021F627B4B34E02E1383EF249981FF8A0A12015BC93AF92CE11B0C",
-          "profile": "C:\\Users\\awx1504202\\.ohos\\config\\default_Metronome_App_YtdVV7AkKXvVweTHTB1vuAW2KS29gDBNnPxmvMi-U_M=.p7b",
+          "keyPassword": "0000001B1C6C4FD5DE114B46A75D817A40C63A52975514F3A57C51D85839FF0ABAF32A0077B0E6FA041E2B",
+          "profile": "C:\\Users\\huawei\\.ohos\\config\\default_Metronome_App_JFS6aVfLClJvavVm6ON9S3dmeqmTsiPXwVHE7fuferI=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\awx1504202\\.ohos\\config\\default_Metronome_App_YtdVV7AkKXvVweTHTB1vuAW2KS29gDBNnPxmvMi-U_M=.p12",
-          "storePassword": "0000001A68E15616F7345084911D4E6C599E67575CC2D9A718FC36E9FB1ED9B1CA6743FA0C93208D2B6C"
+          "storeFile": "C:\\Users\\huawei\\.ohos\\config\\default_Metronome_App_JFS6aVfLClJvavVm6ON9S3dmeqmTsiPXwVHE7fuferI=.p12",
+          "storePassword": "0000001B4D27F34298139A8DC0AA216B024385235A9ED565D14C038D14A2F3D04B669600727CE18096E66B"
         }
       }
     ],
