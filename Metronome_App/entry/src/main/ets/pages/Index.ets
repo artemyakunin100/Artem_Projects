@@ -1,10 +1,14 @@
 import media from '@ohos.multimedia.media'
 import common from '@ohos.app.ability.common'
 
+interface TempoPreset {
+  label: string;
+  BPM: number;
+}
+
 @Entry
 @Component
 struct Metronome {
-
   @State bpm: number = 120
   @State isPlaying: boolean = false
   @State currentBeat: number = 0
@@ -15,18 +19,19 @@ struct Metronome {
   async aboutToAppear() {
     const context = getContext(this) as common.UIAbilityContext
     this.avPlayer = await media.createAVPlayer()
-    const fileDescriptor = await context.resourceManager.getRawFd('freesound_community-metronome-85688.mp3')
-    this.avPlayer.fdSrc = fileDescriptor
-    // When playback finishes, seek back to start so it's ready for next tick
     this.avPlayer.on('stateChange', (state: string) => {
-      if (state === 'completed' && this.avPlayer) {
+      if (state === 'initialized' && this.avPlayer) {
+        this.avPlayer.prepare()
+      } else if (state === 'completed' && this.avPlayer) {
         this.avPlayer.seek(0)
       }
     })
-    await this.avPlayer.prepare()
+    const fileDescriptor = await context.resourceManager.getRawFd('rawfile/click.mp3')
+    this.avPlayer.fdSrc = fileDescriptor
   }
 
   playBeep() {
+    console.error("###")
     if (this.avPlayer) {
       this.avPlayer.play()
     }
@@ -77,14 +82,21 @@ struct Metronome {
         .fontWeight(FontWeight.Bold)
         .fontColor('#E53935')
 
-      Row({ space: 12 }) {
-        ForEach([0,1,2,3,4,5,6,7].slice(0, this.beatsPerMeasure), (i: number) => {
-          Column()
-            .width(32)
-            .height(32)
-            .borderRadius(16)
-            .backgroundColor(this.isPlaying && this.currentBeat === i ? '#E53935' : '#E0E0E0')
-        }, (i: number) => i.toString())
+      Column({ space: 15 }) {
+        Row({ space: 12 }) {
+          ForEach([0, 1, 2, 3, 4, 5, 6, 7].slice(0, this.beatsPerMeasure), (i: number) => {
+            Column()
+              .width(32)
+              .height(32)
+              .borderRadius(16)
+              .backgroundColor(this.isPlaying && this.currentBeat === i ? '#E53935' : '#E0E0E0')
+
+          }, (i: number) => i.toString())
+        }
+
+        Text(`${this.currentBeat + 1}`)
+          .fontColor("#E53935")
+          .fontSize(20)
       }
 
       Column({ space: 8 }) {
@@ -106,6 +118,25 @@ struct Metronome {
           })
       }
 
+      /*
+            Column({ space: 8 }) {
+              Text("Tempo Presets")
+                .fontSize(14)
+                .fontColor('#9E9E9E')
+              Row({ space: 12 }) {
+                ForEach([
+                  { label: "Largo", BPM: 50 },
+                  { label: "Andante", BPM: 76 },
+                  { label: "Moderato", BPM: 108 },
+                  { label: "Allegro", BPM: 132 },
+                  { label: "Presto", BPM: 180 }
+                ], (preset: GeneratedTypeLiteralInterface_1) => {
+
+                })
+              }
+            }
+      */
+
       Column({ space: 8 }) {
         Text('Time Signature')
           .fontSize(14)
@@ -123,6 +154,7 @@ struct Metronome {
           }, (beats: number) => beats.toString())
         }
       }
+
 
       Button(this.isPlaying ? 'Stop' : 'Start')
         .width(160)
